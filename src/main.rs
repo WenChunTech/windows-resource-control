@@ -3,10 +3,11 @@ use std::thread;
 use windows::{
     core::PCSTR,
     Win32::{
+        Foundation::BOOL,
         Security::SECURITY_ATTRIBUTES,
         System::{
             JobObjects::{
-                self, AssignProcessToJobObject, JobObjectCpuRateControlInformation,
+                self, AssignProcessToJobObject, IsProcessInJob, JobObjectCpuRateControlInformation,
                 SetInformationJobObject, JOBOBJECT_CPU_RATE_CONTROL_INFORMATION,
                 JOBOBJECT_CPU_RATE_CONTROL_INFORMATION_0,
                 JOBOBJECT_CPU_RATE_CONTROL_INFORMATION_0_0, JOB_OBJECT_CPU_RATE_CONTROL_ENABLE,
@@ -49,6 +50,16 @@ unsafe fn control_cpu_rate() -> Result<(), Box<dyn std::error::Error>> {
         std::mem::size_of_val(&cpu_rate_info) as u32,
     );
     let cur = GetCurrentProcess();
+    let mut b_in_job = BOOL::default();
+    println!("bInJob: {b_in_job:?}");
+    match IsProcessInJob(cur, job, &mut b_in_job).as_bool() {
+        true => {
+            println!("handle is in job")
+        }
+        false => {
+            println!("handle is not in job")
+        }
+    };
     match AssignProcessToJobObject(job, cur).as_bool() {
         true => {
             println!("assign process to job object success");
