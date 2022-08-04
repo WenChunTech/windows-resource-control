@@ -43,7 +43,7 @@ unsafe fn control_cpu_rate() -> Result<(), Box<dyn std::error::Error>> {
 
     let cur = GetCurrentProcess();
     let mut process_in_job = BOOL::default();
-    println!("bInJob: {b_in_job:?}");
+    println!("bInJob: {process_in_job:?}");
     match AssignProcessToJobObject(job, cur).as_bool() {
         true => {
             println!("assign process to job object success");
